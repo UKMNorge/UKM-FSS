@@ -81,5 +81,8 @@
             "require": "7.1.*",
             "docker": false
         }
+    },
+    "require-dev": {
+        "symfony/web-profiler-bundle": "7.1.*"
     }
 }

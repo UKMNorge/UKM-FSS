@@ -5,10 +5,12 @@ namespace App\Controller;
 use App\Service\ArrSysOpenIDConnect;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-class ApiController
-{
+
+class ApiController extends AbstractController {
     private ArrSysOpenIDConnect $openIDConnect;
 
     public function __construct(ArrSysOpenIDConnect $openIDConnect)
@@ -17,29 +19,39 @@ class ApiController
     }
 
     #[Route('/api/hello', name: 'api_hello', methods: ['GET'])]
-    public function hello(Request $request): JsonResponse
-    {
-        // Extract the Authorization header
-        $authHeader = $request->headers->get('Authorization');
+    public function hello(Request $request) {   
+        // $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
-        if (!$authHeader || !str_starts_with($authHeader, 'Bearer ')) {
-            return new JsonResponse(['error' => 'Unauthorized'], 401);
-        }
-
-        // Extract the token from the header
-        $accessToken = substr($authHeader, 7); // Remove 'Bearer ' prefix
-
-        try {
-            // Verify the token with OpenID Connect
-            $this->openIDConnect->setAccessToken($accessToken);
-            $userInfo = $this->openIDConnect->getUserInfo();
-
-            return new JsonResponse([
-                'message' => 'Hello, ' . $userInfo->name,
-                'user_info' => $userInfo
-            ]);
-        } catch (\Exception $e) {
-            return new JsonResponse(['error' => 'Invalid token'], 401);
-        }
+        
+        return new JsonResponse(['status' => 'Login OK, can continue...'], 200);
     }
+
+
+
+    #[Route('/home', name: 'home', methods: ['GET'])]
+    public function home(Request $request): Response {
+
+        $user = $this->getUser();
+        $name = $user ? $user->getUserIdentifier() : 'NO USER';
+
+        // Render the HTML response
+        return new Response(
+            '<!DOCTYPE html>
+            <html>
+                <head>
+                    <title>Welcome</title>
+                </head>
+                <body>
+                    <h1>Welcome to the Home Page</h1>
+                    <p>User '. $name .'</p>
+
+                    <a href="/login/login">Login</a><br>
+                    <a href="/logout">Logout</a>
+                </body>
+            </html>',
+            200,
+            ['Content-Type' => 'text/html']
+        );
+    }
+
 }
