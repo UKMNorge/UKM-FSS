@@ -47,6 +47,8 @@ class ApiController extends AbstractController {
 
                     <a href="/login/login">Login</a><br>
                     <a href="/logout">Logout</a>
+                    <h3>API</h3>
+                    <a href="/api/hello">API Hello</a>
                 </body>
             </html>',
             200,
