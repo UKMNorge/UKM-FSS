@@ -26,7 +26,7 @@ class ArrSysLoginController extends AbstractController {
         try {
             $this->openIDConnect->authenticate();
         } catch(Exception $e) {
-            return $this->redirectToRoute('ukm_delta_ukmid_homepage');
+            return $this->redirectToRoute('/');
         }
     }
 
@@ -51,10 +51,11 @@ class ArrSysLoginController extends AbstractController {
         $token = $this->openIDConnect->getIdToken();
         $userInfo = $this->openIDConnect->getUserInfo();
 
-        if (!$token || !$userInfo || empty($userInfo->username)) {
+        if (!$token || !$userInfo || empty($userInfo->username) || $this->openIDConnect->verifyJWTsignature($token) != true) {
             return $this->redirectToRoute('/');
         }
 
+        
         // Create a user object
         $user = new OidcUser([
             'sub' => $userInfo->sub,

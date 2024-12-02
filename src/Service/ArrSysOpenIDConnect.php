@@ -10,28 +10,24 @@ class ArrSysOpenIDConnect
     private $oidc;
 
     public function __construct() {
-        $redirectURL = "https://liker.ukm.dev/login/callback";
-        $vippsURL = 'https://ukm.no/';
-        
+        $redirectURL = $_ENV['OPEN_ID_REDIRECT_URL'];
+        $url = $_ENV['OPEN_ID_URL'];
+
+
         $this->oidc = new OpenIDConnectClient(
-            $vippsURL,
-            'client_id_random_string',  // client ID
-            'secretTestDev'   // client secret
+            $url,
+            $_ENV['FSS_OPENID_CLIENT_ID'],  // client ID
+            $_ENV['FSS_OPENID_CLIENT_SECRET']   // client secret
         );        
 
-        $this->oidc->setIssuer($vippsURL);
+        $this->oidc->setIssuer($url);
         $this->oidc->setRedirectURL($redirectURL);
+        $this->oidc->addScope(['openid', 'profile']);
+
     }
 
     public function authenticate() {
-        try {
-            // Set client credentials
-            $this->oidc->setClientID('client_id_random_string');
-            $this->oidc->setClientSecret('secretTestDev');
-    
-            // Add scopes
-            $this->oidc->addScope(['openid', 'profile']);
-    
+        try { 
             // Enforce client_secret_post method
             $this->oidc->setTokenEndpointAuthMethodsSupported(['client_secret_post']);
     
