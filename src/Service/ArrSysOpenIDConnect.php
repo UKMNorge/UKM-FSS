@@ -22,7 +22,7 @@ class ArrSysOpenIDConnect
 
         $this->oidc->setIssuer($url);
         $this->oidc->setRedirectURL($redirectURL);
-        $this->oidc->addScope(['openid', 'profile']);
+        $this->oidc->addScope(['openid', 'profile', 'email', 'phone']);
 
     }
 
@@ -38,7 +38,11 @@ class ArrSysOpenIDConnect
     }
 
     public function getUserInfo() {
-        return $this->oidc->requestUserInfo();
+        try {
+            return $this->oidc->requestUserInfo();
+        } catch(Exception $e) {
+            throw new Exception("Failed to get user info from WPAUTH: " . $e->getMessage());
+        }
     }
 
     public function getIdToken() {
